@@ -1,0 +1,253 @@
+{
+  "info": {
+    "name": "Approval Management API Mock",
+    "description": "Collection de Postman para el API Mock de Aprobaciones - Financiera OH",
+    "schema": "https://schema.getpostman.com/json/collection/v2.1.0/collection.json"
+  },
+  "variable": [
+    {
+      "key": "base_url",
+      "value": "http://localhost:8000/v1",
+      "type": "string"
+    },
+    {
+      "key": "operation_id",
+      "value": "",
+      "type": "string"
+    }
+  ],
+  "item": [
+    {
+      "name": "Health Check",
+      "request": {
+        "method": "GET",
+        "header": [],
+        "url": {
+          "raw": "http://localhost:8000/health",
+          "protocol": "http",
+          "host": ["localhost"],
+          "port": "8000",
+          "path": ["health"]
+        }
+      }
+    },
+    {
+      "name": "Operations",
+      "item": [
+        {
+          "name": "Create Operation",
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "exec": [
+                  "if (pm.response.code === 201) {",
+                  "    const response = pm.response.json();",
+                  "    pm.collectionVariables.set('operation_id', response.data.operationId);",
+                  "    console.log('Operation ID saved:', response.data.operationId);",
+                  "}"
+                ]
+              }
+            }
+          ],
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              },
+              {
+                "key": "X-Correlation-Id",
+                "value": "{{$guid}}"
+              },
+              {
+                "key": "X-Creation-User-Id",
+                "value": "{{$guid}}"
+              }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"companyRuc\": \"20123456789\",\n  \"operationDate\": \"2024-01-10T10:00:00Z\",\n  \"operationType\": \"PAYROLL_PAYMENT\",\n  \"amount\": 15000.50,\n  \"currency\": \"PEN\",\n  \"approvalLevelsRequired\": 2\n}"
+            },
+            "url": {
+              "raw": "{{base_url}}/approvals/operations",
+              "host": ["{{base_url}}"],
+              "path": ["approvals", "operations"]
+            }
+          }
+        },
+        {
+          "name": "List Operations",
+          "request": {
+            "method": "GET",
+            "header": [
+              {
+                "key": "X-Creation-User-Id",
+                "value": "{{$guid}}"
+              }
+            ],
+            "url": {
+              "raw": "{{base_url}}/approvals/operations?page=1&limit=20",
+              "host": ["{{base_url}}"],
+              "path": ["approvals", "operations"],
+              "query": [
+                {
+                  "key": "page",
+                  "value": "1"
+                },
+                {
+                  "key": "limit",
+                  "value": "20"
+                },
+                {
+                  "key": "status",
+                  "value": "PENDING",
+                  "disabled": true
+                }
+              ]
+            }
+          }
+        },
+        {
+          "name": "Get Operation Detail",
+          "request": {
+            "method": "GET",
+            "header": [
+              {
+                "key": "X-Correlation-Id",
+                "value": "{{$guid}}"
+              }
+            ],
+            "url": {
+              "raw": "{{base_url}}/approvals/{{operation_id}}",
+              "host": ["{{base_url}}"],
+              "path": ["approvals", "{{operation_id}}"]
+            }
+          }
+        },
+        {
+          "name": "Cancel Operation",
+          "request": {
+            "method": "DELETE",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              },
+              {
+                "key": "X-Correlation-Id",
+                "value": "{{$guid}}"
+              }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"cancellationReason\": \"Operación duplicada, cancelada por error de registro en el sistema\"\n}"
+            },
+            "url": {
+              "raw": "{{base_url}}/approvals/{{operation_id}}",
+              "host": ["{{base_url}}"],
+              "path": ["approvals", "{{operation_id}}"]
+            }
+          }
+        },
+        {
+          "name": "Get Approvers by Correlation ID",
+          "request": {
+            "method": "GET",
+            "header": [],
+            "url": {
+              "raw": "{{base_url}}/approvals/get/{{$guid}}",
+              "host": ["{{base_url}}"],
+              "path": ["approvals", "get", "{{$guid}}"]
+            }
+          }
+        }
+      ]
+    },
+    {
+      "name": "Approvals",
+      "item": [
+        {
+          "name": "Get Approval Status",
+          "request": {
+            "method": "GET",
+            "header": [
+              {
+                "key": "X-Correlation-Id",
+                "value": "{{$guid}}"
+              },
+              {
+                "key": "X-Creation-User-Id",
+                "value": "{{$guid}}"
+              }
+            ],
+            "url": {
+              "raw": "{{base_url}}/approvals/{{operation_id}}/status",
+              "host": ["{{base_url}}"],
+              "path": ["approvals", "{{operation_id}}", "status"]
+            }
+          }
+        },
+        {
+          "name": "Approve Operation",
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              },
+              {
+                "key": "X-Correlation-Id",
+                "value": "{{$guid}}"
+              },
+              {
+                "key": "X-Creation-User-Id",
+                "value": "{{$guid}}"
+              }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"action\": \"APPROVE\",\n  \"approverUserId\": \"{{$guid}}\",\n  \"operationTarget\": \"TRANSFER\"\n}"
+            },
+            "url": {
+              "raw": "{{base_url}}/approvals/{{operation_id}}/approve",
+              "host": ["{{base_url}}"],
+              "path": ["approvals", "{{operation_id}}", "approve"]
+            }
+          }
+        },
+        {
+          "name": "Reject Operation",
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              },
+              {
+                "key": "X-Correlation-Id",
+                "value": "{{$guid}}"
+              },
+              {
+                "key": "X-Creation-User-Id",
+                "value": "{{$guid}}"
+              }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"action\": \"REJECT\",\n  \"approverUserId\": \"{{$guid}}\",\n  \"operationTarget\": \"TRANSFER\"\n}"
+            },
+            "url": {
+              "raw": "{{base_url}}/approvals/{{operation_id}}/approve",
+              "host": ["{{base_url}}"],
+              "path": ["approvals", "{{operation_id}}", "approve"]
+            }
+          }
+        }
+      ]
+    }
+  ]
+}

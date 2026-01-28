@@ -1,0 +1,270 @@
+{
+  "success": true,
+  "message": "Operaciones obtenidas exitosamente",
+  "data": {
+    "pendingOperations": [
+      {
+        "operationId": "550e8400-e29b-41d4-a716-446655440001",
+        "operationName": "Pago de nómina Enero 2025",
+        "operationDate": "2025-01-09T10:00:00Z",
+        "operationType": "PAYROLL_PAYMENT",
+        "status": "PENDING",
+        "currency": "PEN",
+        "amount": 8348.60,
+        "commision": 10.50,
+        "sourceAccount": {
+          "accountNumber": "123-456789-0-01"
+        },
+        "destinationAccount": {
+          "accountNumber": "00211234567890123456",
+          "beneficiaryName": "EMPRESA DEMO SAC"
+        },
+        "approvalLevelsRequired": 2,
+        "currentApprovalLevel": 1,
+        "createdAt": "2025-01-09T09:00:00Z"
+      },
+      {
+        "operationId": "550e8400-e29b-41d4-a716-446655440002",
+        "operationName": "Transferencia interbancaria - Cliente ABC",
+        "operationDate": "2025-01-09T11:30:00Z",
+        "operationType": "INTERBANK_TRANSFER",
+        "status": "PENDING",
+        "currency": "PEN",
+        "amount": 5200.00,
+        "commision": 8.00,
+        "sourceAccount": {
+          "accountNumber": "123-456789-0-02"
+        },
+        "destinationAccount": {
+          "accountNumber": "00211234567890123457",
+          "beneficiaryName": "GARCIA LOPEZ ANA MARIA"
+        },
+        "approvalLevelsRequired": 2,
+        "currentApprovalLevel": 0,
+        "createdAt": "2025-01-08T14:30:00Z"
+      },
+      {
+        "operationId": "550e8400-e29b-41d4-a716-446655440003",
+        "operationName": "Pago de CTS Diciembre 2024",
+        "operationDate": "2025-01-08T09:15:00Z",
+        "operationType": "CTS_PAYMENT",
+        "status": "PENDING",
+        "currency": "USD",
+        "amount": 2150.75,
+        "commision": 5.50,
+        "sourceAccount": {
+          "accountNumber": "123-456789-0-03"
+        },
+        "destinationAccount": {
+          "accountNumber": "00211234567890123458",
+          "beneficiaryName": "RODRIGUEZ PEREZ CARLOS"
+        },
+        "approvalLevelsRequired": 3,
+        "currentApprovalLevel": 1,
+        "createdAt": "2025-01-08T10:15:00Z"
+      },
+      {
+        "operationId": "550e8400-e29b-41d4-a716-446655440004",
+        "operationName": "Transferencia propia - Fondos operativos",
+        "operationDate": "2025-01-07T16:45:00Z",
+        "operationType": "OWN_TRANSFER",
+        "status": "PENDING",
+        "currency": "PEN",
+        "amount": 12500.00,
+        "commision": 0.00,
+        "sourceAccount": {
+          "accountNumber": "123-456789-0-04"
+        },
+        "destinationAccount": {
+          "accountNumber": "123-456789-0-05",
+          "beneficiaryName": "CUENTA OPERATIVA"
+        },
+        "approvalLevelsRequired": 1,
+        "currentApprovalLevel": 0,
+        "createdAt": "2025-01-07T16:45:00Z"
+      },
+      {
+        "operationId": "550e8400-e29b-41d4-a716-446655440005",
+        "operationName": "Pago de nómina Diciembre 2024",
+        "operationDate": "2025-01-06T08:00:00Z",
+        "operationType": "PAYROLL_PAYMENT",
+        "status": "PENDING",
+        "currency": "PEN",
+        "amount": 15680.90,
+        "commision": 12.00,
+        "sourceAccount": {
+          "accountNumber": "123-456789-0-01"
+        },
+        "destinationAccount": {
+          "accountNumber": "00211234567890123459",
+          "beneficiaryName": "MARTINEZ SANCHEZ LUCIA"
+        },
+        "approvalLevelsRequired": 2,
+        "currentApprovalLevel": 1,
+        "createdAt": "2025-01-06T08:00:00Z"
+      }
+    ],
+    "approvedOperations": [
+      {
+        "operationId": "550e8400-e29b-41d4-a716-446655440101",
+        "operationName": "Pago de nómina Diciembre 2024",
+        "operationDate": "2025-01-06T09:20:00Z",
+        "operationType": "PAYROLL_PAYMENT",
+        "status": "APPROVED",
+        "currency": "PEN",
+        "amount": 7890.50,
+        "commision": 10.50,
+        "sourceAccount": {
+          "accountNumber": "123-456789-0-01"
+        },
+        "destinationAccount": {
+          "accountNumber": "00211234567890123460",
+          "beneficiaryName": "FERNANDEZ RUIZ MIGUEL"
+        },
+        "approvalLevelsRequired": 2,
+        "currentApprovalLevel": 2,
+        "createdAt": "2025-01-06T09:20:00Z"
+      },
+      {
+        "operationId": "550e8400-e29b-41d4-a716-446655440102",
+        "operationName": "Transferencia interbancaria - Proveedor XYZ",
+        "operationDate": "2025-01-05T11:30:00Z",
+        "operationType": "INTERBANK_TRANSFER",
+        "status": "APPROVED",
+        "currency": "PEN",
+        "amount": 3450.00,
+        "commision": 8.00,
+        "sourceAccount": {
+          "accountNumber": "123-456789-0-02"
+        },
+        "destinationAccount": {
+          "accountNumber": "00211234567890123461",
+          "beneficiaryName": "LOPEZ CASTRO SOFIA"
+        },
+        "approvalLevelsRequired": 2,
+        "currentApprovalLevel": 2,
+        "createdAt": "2025-01-05T11:30:00Z"
+      },
+      {
+        "operationId": "550e8400-e29b-41d4-a716-446655440103",
+        "operationName": "Pago de CTS Noviembre 2024",
+        "operationDate": "2025-01-04T14:10:00Z",
+        "operationType": "CTS_PAYMENT",
+        "status": "APPROVED",
+        "currency": "USD",
+        "amount": 1890.25,
+        "commision": 5.50,
+        "sourceAccount": {
+          "accountNumber": "123-456789-0-03"
+        },
+        "destinationAccount": {
+          "accountNumber": "00211234567890123462",
+          "beneficiaryName": "TORRES MENDEZ PABLO"
+        },
+        "approvalLevelsRequired": 3,
+        "currentApprovalLevel": 3,
+        "createdAt": "2025-01-04T14:10:00Z"
+      },
+      {
+        "operationId": "550e8400-e29b-41d4-a716-446655440104",
+        "operationName": "Pago de nómina Noviembre 2024",
+        "operationDate": "2025-01-03T08:45:00Z",
+        "operationType": "PAYROLL_PAYMENT",
+        "status": "APPROVED",
+        "currency": "PEN",
+        "amount": 6750.80,
+        "commision": 10.50,
+        "sourceAccount": {
+          "accountNumber": "123-456789-0-01"
+        },
+        "destinationAccount": {
+          "accountNumber": "00211234567890123463",
+          "beneficiaryName": "RAMIREZ GOMEZ ANDREA"
+        },
+        "approvalLevelsRequired": 2,
+        "currentApprovalLevel": 2,
+        "createdAt": "2025-01-03T08:45:00Z"
+      },
+      {
+        "operationId": "550e8400-e29b-41d4-a716-446655440105",
+        "operationName": "Transferencia interbancaria - Servicios",
+        "operationDate": "2025-01-02T13:25:00Z",
+        "operationType": "INTERBANK_TRANSFER",
+        "status": "APPROVED",
+        "currency": "PEN",
+        "amount": 9200.00,
+        "commision": 8.00,
+        "sourceAccount": {
+          "accountNumber": "123-456789-0-02"
+        },
+        "destinationAccount": {
+          "accountNumber": "00211234567890123464",
+          "beneficiaryName": "SILVA VARGAS RICARDO"
+        },
+        "approvalLevelsRequired": 2,
+        "currentApprovalLevel": 2,
+        "createdAt": "2025-01-02T13:25:00Z"
+      },
+      {
+        "operationId": "550e8400-e29b-41d4-a716-446655440106",
+        "operationName": "Pago de nómina Octubre 2024",
+        "operationDate": "2025-01-01T10:00:00Z",
+        "operationType": "PAYROLL_PAYMENT",
+        "status": "APPROVED",
+        "currency": "PEN",
+        "amount": 5680.30,
+        "commision": 10.50,
+        "sourceAccount": {
+          "accountNumber": "123-456789-0-01"
+        },
+        "destinationAccount": {
+          "accountNumber": "00211234567890123465",
+          "beneficiaryName": "MORALES DIAZ CARMEN"
+        },
+        "approvalLevelsRequired": 2,
+        "currentApprovalLevel": 2,
+        "createdAt": "2025-01-01T10:00:00Z"
+      },
+      {
+        "operationId": "550e8400-e29b-41d4-a716-446655440107",
+        "operationName": "Transferencia propia - Inversión",
+        "operationDate": "2024-12-30T15:30:00Z",
+        "operationType": "OWN_TRANSFER",
+        "status": "APPROVED",
+        "currency": "USD",
+        "amount": 3120.50,
+        "commision": 0.00,
+        "sourceAccount": {
+          "accountNumber": "123-456789-0-04"
+        },
+        "destinationAccount": {
+          "accountNumber": "123-456789-0-06",
+          "beneficiaryName": "CUENTA INVERSION"
+        },
+        "approvalLevelsRequired": 1,
+        "currentApprovalLevel": 1,
+        "createdAt": "2024-12-30T15:30:00Z"
+      },
+      {
+        "operationId": "550e8400-e29b-41d4-a716-446655440108",
+        "operationName": "Pago de nómina Septiembre 2024",
+        "operationDate": "2024-12-29T09:15:00Z",
+        "operationType": "PAYROLL_PAYMENT",
+        "status": "APPROVED",
+        "currency": "PEN",
+        "amount": 7340.90,
+        "commision": 10.50,
+        "sourceAccount": {
+          "accountNumber": "123-456789-0-01"
+        },
+        "destinationAccount": {
+          "accountNumber": "00211234567890123466",
+          "beneficiaryName": "CASTRO REYES PATRICIA"
+        },
+        "approvalLevelsRequired": 2,
+        "currentApprovalLevel": 2,
+        "createdAt": "2024-12-29T09:15:00Z"
+      }
+    ]
+  }
+}

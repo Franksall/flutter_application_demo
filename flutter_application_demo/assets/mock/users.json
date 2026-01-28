@@ -1,0 +1,31 @@
+{
+  "users": [
+    {
+      "id": "1",
+      "documentType": "DNI",
+      "documentNumber": "12345678",
+      "password": "123456",
+      "name": "Juan Carlos Miranda",
+      "token": "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJ1c2VySWQiOiIxIiwiaWF0IjoxNjE2MjM5MDIyfQ",
+      "requiresFacialVerification": true
+    },
+    {
+      "id": "2",
+      "documentType": "DNI",
+      "documentNumber": "87654321",
+      "password": "password",
+      "name": "María Elena Torres",
+      "token": "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJ1c2VySWQiOiIyIiwiaWF0IjoxNjE2MjM5MDIyfQ",
+      "requiresFacialVerification": false
+    },
+    {
+      "id": "3",
+      "documentType": "CE",
+      "documentNumber": "ABC123456",
+      "password": "123456",
+      "name": "Diego Vasquez Medrano",
+      "token": "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJ1c2VySWQiOiIzIiwiaWF0IjoxNjE2MjM5MDIyfQ",
+      "requiresFacialVerification": true
+    }
+  ]
+}

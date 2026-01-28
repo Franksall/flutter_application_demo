@@ -1,0 +1,64 @@
+{
+  "operations": [            {
+                "operationId": "a97bd1d1-b8c8-4cc4-bcbc-0b694949626c",
+                "operationName": "Operación CTS_PAYMENT",
+                "operationDate": "2026-01-06T14:51:18.373973",
+                "operationType": "CTS_PAYMENT",
+                "status": "APPROVED",
+                "currency": "PEN",
+                "amount": 35428.65,
+                "commision": 41.03,
+                "sourceAccount": {
+                    "accountNumber": "564-372148-7-72"
+                },
+                "destinationAccount": {
+                    "accountNumber": "92667763660797596314",
+                    "beneficiaryName": "INDUSTRIAS MODELO SAC"
+                },
+                "approvalLevelsRequired": 1,
+                "currentApprovalLevel": 0,
+                "createdAt": "2025-12-24T14:51:18.374004"
+            },
+            {
+                "operationId": "c11d3fc3-8578-4cc6-9716-7433be2cb962",
+                "operationName": "Operación PAYROLL_PAYMENT",
+                "operationDate": "2026-01-12T14:51:18.374326",
+                "operationType": "PAYROLL_PAYMENT",
+                "status": "PENDING",
+                "currency": "USD",
+                "amount": 33141.24,
+                "commision": 40.41,
+                "sourceAccount": {
+                    "accountNumber": "367-692991-2-52"
+                },
+                "destinationAccount": {
+                    "accountNumber": "34365965210745548113",
+                    "beneficiaryName": "CORPORACION ABC SAC"
+                },
+                "approvalLevelsRequired": 1,
+                "currentApprovalLevel": 0,
+                "createdAt": "2026-01-08T14:51:18.374366"
+        
+            },
+            {
+                "operationId": "ac8a1ed7-e406-42db-b062-22ffaabd69ce",
+                "operationName": "Operación CTS_PAYMENT",
+                "operationDate": "2025-12-15T14:51:18.374576",
+                "operationType": "CTS_PAYMENT",
+                "status": "PENDING",
+                "currency": "USD",
+                "amount": 38527.35,
+                "commision": 20.68,
+                "sourceAccount": {
+                    "accountNumber": "187-251986-2-51"
+                },
+                "destinationAccount": {
+                    "accountNumber": "32490784080513163591",
+                    "beneficiaryName": "COMERCIAL PERU SA"
+                },
+                "approvalLevelsRequired": 2,
+                "currentApprovalLevel": 0,
+                "createdAt": "2026-01-04T14:51:18.374614"
+            }],
+  "approvals": []
+}

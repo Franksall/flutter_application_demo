@@ -1,0 +1,1024 @@
+openapi: 3.0.3
+info:
+  title: Approval Management API - Plataforma del Empleador
+  description: API para gestión centralizada de aprobaciones en la Plataforma
+    del Empleador.
+  version: 1.0.0
+  contact:
+    name: Financiera Oh - Plataforma del Empleador
+    email: api-support@financieraoh.com
+  license:
+    name: Proprietary
+    url: https://financieraoh.com/licenses
+servers:
+  - url: https://api.financieraoh.com/v1
+    description: Producción
+  - url: https://api-staging.financieraoh.com/v1
+    description: Staging
+  - url: https://bstinpasivosout.des-gke.financieraoh.local
+    description: Desarrollo
+tags:
+  - name: Operations
+    description: Gestión de operaciones pendientes de aprobación
+  - name: Approvals
+    description: Gestión de firmas y aprobaciones individuales
+paths:
+  "/approvals/operations":
+    post:
+      tags:
+        - Operations
+      summary: Crear operación de aprobación
+      description: Crea una nueva operación que requiere aprobación dual. Este endpoint
+        es invocado automáticamente por otros módulos cuando se requiere aprobación
+        para operaciones como transferencias o pagos masivos.
+      operationId: createApprovalOperation
+      parameters:
+        - "$ref": "#/components/parameters/X-Correlation-Id-Header"
+        - "$ref": "#/components/parameters/X-Creation-User-Id-Header"
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              "$ref": "#/components/schemas/BsCreateOperationRequest"
+      responses:
+        '201':
+          "$ref": "#/components/responses/CreateOperationSuccess"
+        '400':
+          "$ref": "#/components/responses/BadRequest"
+        '401':
+          "$ref": "#/components/responses/Unauthorized"
+        '500':
+          "$ref": "#/components/responses/InternalServerError"
+    get:
+      tags:
+        - Operations
+      summary: Listar operaciones
+      description: Obtiene el listado de operaciones pendientes o aprobadas de un usuario en concreto
+      operationId: listOperations
+      parameters:
+        - "$ref": "#/components/parameters/X-Creation-User-Id-Header"
+        - "$ref": '#/components/parameters/X-Company-RUC-Header'
+        - "$ref": "#/components/parameters/StatusQueryParam"
+        - "$ref": "#/components/parameters/PageQueryParam"
+        - "$ref": "#/components/parameters/LimitQueryParam"
+      responses:
+        '200':
+          "$ref": "#/components/responses/ListOperationsSuccess"
+        '401':
+          "$ref": "#/components/responses/Unauthorized"
+        '500':
+          "$ref": "#/components/responses/InternalServerError"
+  "/approvals/{operationId}":
+    get:
+      tags:
+        - Operations
+      summary: Obtener detalle de operación
+      description: Obtiene el detalle completo de una operación de aprobación incluyendo
+        metadata adicional y el historial de firmas.
+      operationId: getOperationDetail
+      parameters:
+        - "$ref": "#/components/parameters/X-Correlation-Id-Header"
+        - "$ref": "#/components/parameters/OperationIdPathParam"
+      responses:
+        '200':
+          "$ref": "#/components/responses/GetOperationDetailSuccess"
+        '401':
+          "$ref": "#/components/responses/Unauthorized"
+        '404':
+          "$ref": "#/components/responses/NotFound"
+        '500':
+          "$ref": "#/components/responses/InternalServerError"
+    delete:
+      tags:
+        - Operations
+      summary: Cancelar operación
+      description: Cancela una operación pendiente de aprobación. Solo puede ser ejecutado
+        por el usuario que creó la operación o por usuarios con permisos administrativos.
+      operationId: cancelOperation
+      parameters:
+        - "$ref": "#/components/parameters/X-Correlation-Id-Header"
+        - "$ref": "#/components/parameters/OperationIdPathParam"
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              "$ref": "#/components/schemas/BsCancelOperationRequest"
+      responses:
+        '200':
+          "$ref": "#/components/responses/CancelOperationSuccess"
+        '400':
+          "$ref": "#/components/responses/OperationCannotBeCancelled"
+        '401':
+          "$ref": "#/components/responses/Unauthorized"
+        '403':
+          "$ref": "#/components/responses/Forbidden"
+        '404':
+          "$ref": "#/components/responses/NotFound"
+        '500':
+          "$ref": "#/components/responses/InternalServerError"
+  "/approvals/{operationId}/status":
+    get:
+      tags:
+        - Approvals
+      summary: Obtener estado de firmas
+      description: Consulta el estado actual de todas las firmas requeridas para una
+        operación específica. Muestra qué aprobadores ya firmaron y quiénes están
+        pendientes.
+      operationId: getApprovalStatus
+      parameters:
+        - "$ref": "#/components/parameters/X-Correlation-Id-Header"
+        - "$ref": "#/components/parameters/X-Creation-User-Id-Header"
+        - "$ref": "#/components/parameters/OperationIdPathParam"
+      responses:
+        '200':
+          "$ref": "#/components/responses/GetApprovalStatusSuccess"
+        '401':
+          "$ref": "#/components/responses/Unauthorized"
+        '404':
+          "$ref": "#/components/responses/NotFound"
+        '500':
+          "$ref": "#/components/responses/InternalServerError"
+  "/approvals/{operationId}/approve":
+    post:
+      tags:
+        - Approvals
+      summary: Firmar instrucción (aprobar o rechazar)
+      description: Permite a un aprobador firmar una operación. Puede aprobar o rechazar la operación.
+      operationId: signApprovalOperation
+      parameters:
+        - "$ref": "#/components/parameters/X-Correlation-Id-Header"
+        - "$ref": "#/components/parameters/X-Creation-User-Id-Header"
+        - "$ref": "#/components/parameters/OperationIdPathParam"
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              "$ref": "#/components/schemas/BsApprovalSignRequest"
+      responses:
+        '200':
+          "$ref": "#/components/responses/SignApprovalSuccess"
+        '400':
+          "$ref": "#/components/responses/ValidationError"
+        '401':
+          "$ref": "#/components/responses/Unauthorized"
+        '403':
+          "$ref": "#/components/responses/NotAuthorizedApprover"
+        '404':
+          "$ref": "#/components/responses/NotFound"
+        '500':
+          "$ref": "#/components/responses/InternalServerError"
+  "/approvals/get/{correlationId}":
+    get:
+      tags:
+        - Operations
+      summary: Obtener los aprovadores de una operacion
+      description: Obtiene el detalle de los aprobadores de una operacion
+      operationId: getApprovalOperationDetail
+      parameters:
+        - $ref: '#/components/parameters/BsCorrelationIdParam'
+      responses:
+        '200':
+          "$ref": "#/components/responses/BsGetApprovalOperationDetail"
+        '401':
+          "$ref": "#/components/responses/Unauthorized"
+        '404':
+          "$ref": "#/components/responses/NotFound"
+        '500':
+          "$ref": "#/components/responses/InternalServerError"
+components:
+  parameters:
+    BsCorrelationIdParam:
+      name: correlationId
+      in: path
+      required: true
+      schema:
+        type: string
+        format: uuid
+    X-Creation-User-Id-Header:
+      name: X-Creation-User-Id
+      in: header
+      description: ID de correlación único para el rastreo de la solicitud a través
+        de los diferentes servicios. Si no se proporciona, el sistema generará uno
+        automáticamente.
+      required: false
+      schema:
+        type: string
+        format: uuid
+        example: 550e8400-e29b-41d4-a716-446655440000
+    X-Company-RUC-Header:
+      name: X-Company-RUC
+      in: header
+      description: RUC de la empresa para la cual se ejecuta la operación. Es crítico para identificar la compañía que realiza la transferencia (columna 'company_ruc').
+      required: false
+      schema:
+        type: string
+        pattern: '^[0-9]{11}$'
+        example: '20123456789'
+    X-Correlation-Id-Header:
+      name: X-Correlation-Id
+      in: header
+      description: ID de correlación único para el rastreo de la solicitud a través
+        de los diferentes servicios. Si no se proporciona, el sistema generará uno
+        automáticamente.
+      required: false
+      schema:
+        type: string
+        format: uuid
+        example: 550e8400-e29b-41d4-a716-446655440000
+    OperationIdPathParam:
+      name: operationId
+      in: path
+      description: ID de la operación
+      required: true
+      schema:
+        type: string
+        format: uuid
+    StatusQueryParam:
+      name: status
+      in: query
+      description: Filtrar por estado de operación
+      required: false
+      schema:
+        "$ref": "#/components/schemas/BsOperationStatus"
+    TransferTypeQueryParam:
+      name: transferType
+      in: query
+      description: Filtrar por tipo de operación
+      required: false
+      schema:
+        "$ref": "#/components/schemas/BsTransferType"
+    DateFromQueryParam:
+      name: dateFrom
+      in: query
+      description: Fecha inicial (ISO 8601)
+      required: false
+      schema:
+        type: string
+        format: date-time
+      example: '2025-10-01T00:00:00Z'
+    DateToQueryParam:
+      name: dateTo
+      in: query
+      description: Fecha final (ISO 8601)
+      required: false
+      schema:
+        type: string
+        format: date-time
+      example: '2025-10-02T23:59:59Z'
+    PageQueryParam:
+      name: page
+      in: query
+      description: Número de página (inicia en 1)
+      required: false
+      schema:
+        type: integer
+        minimum: 1
+        default: 1
+    LimitQueryParam:
+      name: limit
+      in: query
+      description: Registros por página
+      required: false
+      schema:
+        type: integer
+        minimum: 10
+        maximum: 100
+        default: 20
+  responses:
+    BsGetApprovalOperationDetail:
+      description: Detalle obtenido exitosamente
+      content:
+        application/json:
+          schema:
+            "$ref": "#/components/schemas/BsSignApprovalListResponse"
+    CreateOperationSuccess:
+      description: Operación creada exitosamente
+      content:
+        application/json:
+          schema:
+            "$ref": "#/components/schemas/BsCreateOperationResponse"
+    ListOperationsSuccess:
+      description: Listado obtenido exitosamente
+      content:
+        application/json:
+          schema:
+            "$ref": "#/components/schemas/BsListOperationsResponse"
+    GetOperationDetailSuccess:
+      description: Detalle obtenido exitosamente
+      content:
+        application/json:
+          schema:
+            "$ref": "#/components/schemas/BsGetOperationDetailResponse"
+    CancelOperationSuccess:
+      description: Operación cancelada exitosamente
+      content:
+        application/json:
+          schema:
+            "$ref": "#/components/schemas/BsCancelOperationResponse"
+    GetApprovalStatusSuccess:
+      description: Estado obtenido exitosamente
+      content:
+        application/json:
+          schema:
+            "$ref": "#/components/schemas/BsGetApprovalStatusResponse"
+    SignApprovalSuccess:
+      description: Firma registrada exitosamente
+      content:
+        application/json:
+          schema:
+            "$ref": "#/components/schemas/BsSignApprovalResponse"
+    BadRequest:
+      description: Error de validación
+      content:
+        application/json:
+          schema:
+            "$ref": "#/components/schemas/ApiError"
+    ValidationError:
+      description: Error de validación en firma de aprobación
+      content:
+        application/json:
+          schema:
+            "$ref": "#/components/schemas/ApiError"
+          example:
+            success: false
+            message: Error de validación en la firma
+            errors:
+              - code: INVALID_SIGNING
+                message: No se pudo colocar la firma.
+                field: sign
+    Unauthorized:
+      description: No autenticado
+      content:
+        application/json:
+          schema:
+            "$ref": "#/components/schemas/ApiError"
+          example:
+            success: false
+            message: Token de autenticación inválido o expirado
+            errors:
+              - code: UNAUTHORIZED
+                message: Token de autenticación inválido o expirado
+    Forbidden:
+      description: Acceso prohibido - El usuario no tiene permisos suficientes
+      content:
+        application/json:
+          schema:
+            "$ref": "#/components/schemas/ApiError"
+    NotAuthorizedApprover:
+      description: Usuario no autorizado como aprobador para la operación
+      content:
+        application/json:
+          schema:
+            "$ref": "#/components/schemas/ApiError"
+    NotFound:
+      description: Recurso no encontrado
+      content:
+        application/json:
+          schema:
+            "$ref": "#/components/schemas/ApiError"
+          example:
+            success: false
+            message: Lote no encontrado
+            errors:
+              - code: NOT_FOUND
+                message: No se encontró el lote con ID especificado
+    OperationCannotBeCancelled:
+      description: Operación no puede ser cancelada
+      content:
+        application/json:
+          schema:
+            "$ref": "#/components/schemas/ApiError"
+    InternalServerError:
+      description: Error interno del servidor
+      content:
+        application/json:
+          schema:
+            "$ref": "#/components/schemas/ApiError"
+          example:
+            success: false
+            message: Error interno del servidor
+            errors:
+              - code: INTERNAL_SERVER_ERROR
+                message: Ocurrió un error inesperado en el servidor
+  schemas:
+    ApiResponse:
+      type: object
+      required:
+        - success
+        - message
+      description: Estructura estándar de respuesta para todas las APIs
+      properties:
+        success:
+          type: boolean
+          description: Indica si la operación fue exitosa
+        message:
+          type: string
+          description: Mensaje descriptivo del resultado
+        data:
+          type: object
+          description: Datos de respuesta (opcional)
+    ApiError:
+      type: object
+      required:
+        - success
+        - message
+      properties:
+        success:
+          type: boolean
+          description: Indica si la operación fue exitosa
+          example: 'false'
+        message:
+          type: string
+          description: Mensaje descriptivo del error
+          example: El campo es requerido
+        errors:
+          type: array
+          items:
+            "$ref": "#/components/schemas/ApiErrorItem"
+          description: Lista de errores encontrados en el registro
+    ApiErrorItem:
+      type: object
+      required:
+        - code
+        - message
+      description: Estructura de error estándar
+      properties:
+        code:
+          type: string
+          description: Código único del error
+          example: VALIDATION_ERROR
+        message:
+          type: string
+          description: Mensaje descriptivo del error
+          example: El campo es requerido
+        field:
+          type: string
+          description: Campo relacionado al error (opcional)
+          example: companyId
+    PaginationInfo:
+      type: object
+      required:
+        - page
+        - limit
+        - total
+        - pages
+      description: Información de paginación estándar
+      properties:
+        page:
+          type: integer
+          minimum: 1
+          description: Número de página actual
+        limit:
+          type: integer
+          minimum: 10
+          maximum: 100
+          description: Registros por página
+        total:
+          type: integer
+          minimum: 0
+          description: Total de registros encontrados
+        pages:
+          type: integer
+          minimum: 0
+          description: Total de páginas disponibles
+        hasNext:
+          type: boolean
+          description: Indica si hay página siguiente
+        hasPrevious:
+          type: boolean
+          description: Indica si hay página anterior
+    BsOperationStatus:
+      type: string
+      enum:
+        - PENDING
+        - APPROVED
+        - REJECTED
+        - PROCESSING
+        - COMPLETED
+        - FAILED
+        - CANCELLED
+      description: Estados posibles de una operación de aprobación
+    BsApprovalStatus:
+      type: string
+      enum:
+        - APPROVED
+        - REJECTED
+        - EXPIRED
+        - CANCELLED
+      description: Estados posibles de una firma individual
+    BsApprovalAction:
+      type: string
+      enum:
+        - APPROVE
+        - REJECT
+    BsOperationTarget:
+      type: string
+      enum:
+        - TRANSFER
+        - PAYROLL
+      description: Acciones posibles para una firma
+    BsCurrencyType:
+      type: string
+      enum:
+        - PEN
+        - USD
+      description: Tipo de moneda
+    BsTransferType:
+      type: string
+      enum:
+        - PAYROLL_PAYMENT
+        - CTS_PAYMENT
+        - INTERBANK_TRANSFER
+        - OWN_TRANSFER
+      example: PAYROLL_PAYMENT
+      description: Tipos de operación que requieren aprobación
+    BsOperationType:
+      type: string
+      enum:
+        - PAYROLL_PAYMENT
+        - CTS_PAYMENT
+        - INTERBANK_TRANSFER
+        - OWN_TRANSFER
+      example: PAYROLL_PAYMENT
+      description: Tipos de operación que requieren aprobación
+    BsAccountType:
+      type: string
+      enum:
+        - SAVINGS
+        - CURRENT
+        - CTS
+        - SALARY
+      description: Tipos de cuenta bancaria
+    BsCreateOperationRequest:
+      type: object
+      required:
+        - companyRuc
+        - operationDate
+        - operationType
+        - amount
+        - currency
+        - approvalLevelsRequired
+      properties:
+        companyRuc:
+          type: string
+          description: RUC de la compañía (si aplica, ej. nómina).
+        operationDate:
+          type: string
+          format: date-time
+          description: Fecha y hora de la operación (ISO 8601)
+        operationType:
+          "$ref": "#/components/schemas/BsOperationType"
+        amount:
+          type: number
+          format: decimal
+          minimum: 0
+          multipleOf: 0.01
+          description: Monto de la operación
+        currency:
+          "$ref": "#/components/schemas/BsCurrencyType"
+        approvalLevelsRequired:
+          type: integer
+          minimum: 0
+          description: Niveles de aprobación requeridos
+        users:
+          type: array
+          description: Lista de posibles aprobadores
+          items:
+            type: object
+            required:
+              - id
+              - email
+              - name
+            properties:
+              id:
+                type: string
+                format: uuid
+                description: User ID
+              email:
+                type: string
+                format: email
+                description: User email address
+              name:
+                type: string
+                description: User full name
+    BsApprovalSignRequest:
+      type: object
+      required:
+        - action
+        - approverUserId
+      properties:
+        action:
+          "$ref": "#/components/schemas/BsApprovalAction"
+        approverUserId:
+          type: string
+          format: uuid
+        operationTarget:
+          "$ref": '#/components/schemas/BsOperationTarget'
+    BsCancelOperationRequest:
+      type: object
+      required:
+        - cancellationReason
+      properties:
+        cancellationReason:
+          type: string
+          minLength: 10
+          maxLength: 500
+          description: Razón de la cancelación de la operación
+    BsOperation:
+      type: object
+      description: Operación pendiente de aprobación
+      allOf:
+        - type: object
+          required:
+            - operationId
+            - operationName
+            - operationDate
+            - status
+            - transferType
+            - sourceAccountNumber
+            - sourceAccountType
+            - approvalLevelsRequired
+            - currentApprovalLevel
+          properties:
+            operationId:
+              type: string
+              format: uuid
+              description: Identificador único de la operación
+            operationName:
+              type: string
+              maxLength: 255
+              description: Nombre descriptivo de la operación
+            operationDate:
+              type: string
+              format: date-time
+              description: Fecha y hora de la operación
+            status:
+              "$ref": "#/components/schemas/BsOperationStatus"
+            sourceAccountNumber:
+              type: string
+              pattern: "^[0-9]{3}-[0-9]{6}-[0-9]-[0-9]{2}$"
+              description: Número de cuenta de origen
+            sourceAccountType:
+              "$ref": "#/components/schemas/BsAccountType"
+            beneficiaryName:
+              type: string
+              maxLength: 255
+              description: Nombre del beneficiario
+            transferType:
+              "$ref": "#/components/schemas/BsTransferType"
+            amount:
+              type: number
+              format: decimal
+              minimum: 0
+              description: Monto en soles
+            currency:
+              "$ref": "#/components/schemas/BsCurrencyType"
+            destinationAccountNumber:
+              type: string
+              maxLength: 21
+              description: Número de cuenta o CCI de destino
+            approvalLevelsRequired:
+              type: integer
+              minimum: 1
+              maximum: 3
+              description: Niveles de aprobación requeridos
+            currentApprovalLevel:
+              type: integer
+              minimum: 0
+              description: Nivel de aprobación actual alcanzado
+            expiresAt:
+              type: string
+              format: date-time
+              description: Fecha y hora de expiración
+            approvedAt:
+              type: string
+              format: date-time
+              description: Fecha y hora de aprobación completa
+            rejectedAt:
+              type: string
+              format: date-time
+              description: Fecha y hora de rechazo
+            approvals:
+              type: array
+              description: Lista de firmas requeridas
+              items:
+                "$ref": "#/components/schemas/BsApproval"
+    BsApproval:
+      type: object
+      description: Firma individual de aprobación
+      allOf:
+        - type: object
+          required:
+            - approvalId
+            - operationId
+            - approverUserId
+            - approvalName
+            - approvalLevel
+            - status
+          properties:
+            approvalId:
+              type: string
+              format: uuid
+              description: Identificador único de la aprobación
+            operationId:
+              type: string
+              format: uuid
+              description: Referencia a la operación
+            approverUserId:
+              type: string
+              format: uuid
+              description: ID del usuario aprobador
+            approvalName:
+              type: string
+              maxLength: 255
+              description: Nombre completo del aprobador y cargo
+            approvalLevel:
+              type: integer
+              minimum: 1
+              maximum: 3
+              description: Nivel de aprobación (1, 2 o 3)
+            status:
+              "$ref": "#/components/schemas/BsApprovalStatus"
+            action:
+              "$ref": "#/components/schemas/BsApprovalAction"
+            rejectionReason:
+              type: string
+              maxLength: 500
+              description: Razón del rechazo si aplica
+            passwordVerified:
+              type: boolean
+              description: Indica si se verificó la contraseña
+            otpVerified:
+              type: boolean
+              description: Indica si se verificó el código OTP
+            signedAt:
+              type: string
+              format: date-time
+              description: Fecha y hora de la firma
+            expiresAt:
+              type: string
+              format: date-time
+              description: Fecha y hora de expiración de la firma
+    BsOperationSummary:
+      type: object
+      description: Resumen de operación para listados
+      required:
+        - operationId
+        - operationName
+        - operationDate
+        - operationType
+        - status
+        - approvalLevelsRequired
+        - currentApprovalLevel
+        - createdAt
+      properties:
+        operationId:
+          type: string
+          format: uuid
+        operationName:
+          type: string
+        operationDate:
+          type: string
+          format: date-time
+        operationType:
+          "$ref": "#/components/schemas/BsOperationType"
+        status:
+          "$ref": "#/components/schemas/BsOperationStatus"
+        currency:
+          "$ref": "#/components/schemas/BsCurrencyType"
+        amount:
+          type: number
+          format: decimal
+        commision:
+          type: number
+          format: decimal
+        sourceAccount:
+          $ref: '#/components/schemas/BsAccountSummary'
+        destinationAccount:
+          $ref: '#/components/schemas/BsDestinationAccountSummary'
+        approvalLevelsRequired:
+          type: integer
+        currentApprovalLevel:
+          type: integer
+        createdAt:
+          type: string
+          format: date-time
+    BsApprovalSummary:
+      type: object
+      description: Resumen de firma para consultas de estado
+      required:
+        - approvalId
+        - approvalLevel
+        - status
+      properties:
+        approvalId:
+          type: string
+          format: uuid
+        approvalLevel:
+          type: integer
+        status:
+          "$ref": "#/components/schemas/BsApprovalStatus"
+        signedAt:
+          type: string
+          format: date-time
+    BsCreateOperationResponseData:
+      type: object
+      required:
+        - operationId
+        - operationName
+        - status
+        - approvalLevelsRequired
+      properties:
+        operationId:
+          type: string
+          format: uuid
+        operationName:
+          type: string
+        status:
+          "$ref": "#/components/schemas/BsOperationStatus"
+        approvalLevelsRequired:
+          type: integer
+          example: 2
+    BsCreateOperationResponse:
+      allOf:
+        - "$ref": "#/components/schemas/ApiResponse"
+        - type: object
+          properties:
+            data:
+              "$ref": "#/components/schemas/BsCreateOperationResponseData"
+    BsListOperationsResponseData:
+      type: object
+      required:
+        - operations
+        - pagination
+      properties:
+        operations:
+          type: array
+          items:
+            "$ref": "#/components/schemas/BsOperationSummary"
+        pagination:
+          "$ref": "#/components/schemas/PaginationInfo"
+    BsListOperationsResponse:
+      allOf:
+        - "$ref": "#/components/schemas/ApiResponse"
+        - type: object
+          properties:
+            data:
+              "$ref": "#/components/schemas/BsListOperationsResponseData"
+    BsGetOperationDetailResponse:
+      allOf:
+        - "$ref": "#/components/schemas/ApiResponse"
+        - type: object
+          properties:
+            data:
+              "$ref": "#/components/schemas/BsOperation"
+    BsCancelOperationResponseData:
+      type: object
+      required:
+        - operationId
+        - status
+        - cancelledAt
+        - cancelledBy
+        - cancellationReason
+      properties:
+        operationId:
+          type: string
+          format: uuid
+        status:
+          "$ref": "#/components/schemas/BsOperationStatus"
+        cancelledAt:
+          type: string
+          format: date-time
+        cancelledBy:
+          type: string
+        cancellationReason:
+          type: string
+    BsCancelOperationResponse:
+      allOf:
+        - "$ref": "#/components/schemas/ApiResponse"
+        - type: object
+          properties:
+            data:
+              "$ref": "#/components/schemas/BsCancelOperationResponseData"
+    BsGetApprovalStatusResponseData:
+      type: object
+      required:
+        - operationId
+        - operationName
+        - status
+        - approvalLevelsRequired
+        - currentApprovalLevel
+        - approvals
+      properties:
+        operationId:
+          type: string
+          format: uuid
+        operationName:
+          type: string
+        status:
+          "$ref": "#/components/schemas/BsOperationStatus"
+        amount:
+          type: number
+          format: decimal
+        beneficiaryName:
+          type: string
+        approvalLevelsRequired:
+          type: integer
+        currentApprovalLevel:
+          type: integer
+        expiresAt:
+          type: string
+          format: date-time
+        approvals:
+          type: array
+          items:
+            "$ref": "#/components/schemas/BsApprovalSummary"
+    BsGetApprovalStatusResponse:
+      allOf:
+        - "$ref": "#/components/schemas/ApiResponse"
+        - type: object
+          properties:
+            data:
+              "$ref": "#/components/schemas/BsGetApprovalStatusResponseData"
+    BsSignApprovalResponseData:
+      type: object
+      required:
+        - approvalId
+        - operationId
+        - action
+        - operationStatus
+        - approvalLevel
+        - approvalName
+        - signedAt
+      properties:
+        correlationId:
+          type: string
+          format: uuid
+        approvalId:
+          type: string
+          format: uuid
+        operationId:
+          type: string
+          format: uuid
+        operationType:
+          "$ref": "#/components/schemas/BsOperationType"
+        action:
+          "$ref": "#/components/schemas/BsApprovalStatus"
+        operationStatus:
+          "$ref": "#/components/schemas/BsOperationStatus"
+        approvalLevel:
+          type: integer
+        approvalName:
+          type: string
+        approvalMail:
+          type: string
+        signedAt:
+          type: string
+          format: date-time
+        rejectedAt:
+          type: string
+          format: date-time
+        approvalLevelsRequired:
+          type: integer
+        approvedAt:
+          type: string
+          format: date-time
+    BsSignApprovalResponse:
+      allOf:
+        - "$ref": "#/components/schemas/ApiResponse"
+        - type: object
+          properties:
+            data:
+              "$ref": "#/components/schemas/BsSignApprovalResponseData"
+    BsSignApprovalListResponse:
+      allOf:
+        - "$ref": "#/components/schemas/ApiResponse"
+        - type: object
+          properties:
+            data:
+              type: array
+              items:
+                "$ref": "#/components/schemas/BsSignApprovalResponseData"
+    BsAccountSummary:
+      type: object
+      required:
+        - accountNumber
+      properties:
+        accountNumber:
+          type: string
+          description: Número de cuenta
+          example: 123-456789-0-01
+    BsDestinationAccountSummary:
+      type: object
+      properties:
+        accountNumber:
+          type: string
+          description: Número de cuenta o CCI de destino
+          example: '00211234567890123456'
+        beneficiaryName:
+          type: string
+          description: Nombre del beneficiario
+          example: EMPRESA DEMO SAC
