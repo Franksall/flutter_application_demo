@@ -1,23 +1,28 @@
-import 'package:flutter_application_demo/core/network/api_client.dart';
-import 'package:flutter_application_demo/core/resources/data_state.dart';
-import '../../domain/repositories/i_otp_repository.dart';
+import 'dart:convert';
+import 'dart:io';
+import 'package:http/http.dart' as http;
 
 class TotpRepositoryImpl implements IOtpRepository {
-  final ApiClient _apiClient;
+  TotpRepositoryImpl({required this.baseUrl});
 
-  TotpRepositoryImpl(this._apiClient);
+  /** Para casos practicos y al haber probado localmente, la base
+   * url utilizada fue http://localhost:8080/totp
+   * En emulador android -> http://10.0.2.2:8080/totp
+   */
+  final String baseUrl;
 
   @override
   Future<DataState<String>> enroll() async {
     try {
-      final response = await _apiClient.post('/totp/enroll');
+      final response = await http.post(Uri.parse('$baseUrl/enroll'));
 
-      if (response.statusCode == 200) {
-        return DataSuccess(response.data["base32Secret"]);
+      if (response.statusCode == HttpStatus.ok) {
+        final Map<String, dynamic> body = jsonDecode(response.body);
+        return DataSuccess(body["base32Secret"]);
       }
       return DataFailed('Error: ${response.statusCode}');
     } catch (e) {
-      return DataFailed(e.toString());
+      return DataFailed('$e');
     }
   }
 
@@ -27,17 +32,18 @@ class TotpRepositoryImpl implements IOtpRepository {
     required String secret,
   }) async {
     try {
-      final response = await _apiClient.post(
-        '/totp/validate',
-        data: {'base32Secret': secret, 'otp': otp},
+      final response = await http.post(
+        Uri.parse('$baseUrl/validate'),
+        headers: <String, String>{'Content-Type': 'application/json'},
+        body: jsonEncode(<String, String>{'base32Secret': secret, 'otp': otp}),
       );
 
-      if (response.statusCode == 200) {
-        return DataSuccess(response.data.toString().toLowerCase() == 'true');
+      if (response.statusCode == HttpStatus.ok) {
+        return DataSuccess(response.body.toLowerCase() == 'true');
       }
       return DataFailed('Error: ${response.statusCode}');
     } catch (e) {
-      return DataFailed(e.toString());
+      return DataFailed('$e');
     }
   }
 }
