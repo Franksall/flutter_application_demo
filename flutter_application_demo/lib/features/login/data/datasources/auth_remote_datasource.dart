@@ -1,6 +1,7 @@
 import 'package:flutter_application_demo/core/network/api_client.dart';
 import 'package:flutter_application_demo/core/error/exceptions.dart';
 import 'package:flutter_application_demo/features/login/data/models/user_model.dart';
+import 'package:dio/dio.dart';
 
 abstract class AuthRemoteDataSource {
   Future<UserModel> login({
@@ -24,16 +25,24 @@ class AuthRemoteDataSourceImpl implements AuthRemoteDataSource {
   }) async {
     try {
       final response = await apiClient.post(
-        '/auth/login',
+        '/auth/ctaemp/login',
+        options: Options(
+          headers: {
+            'x-api-key': 'PnUbTpebJ7FftGy4HCrfW7gSdaxAVjh0xOT1k9K7JLwIBJsw',
+            'Content-Type': 'application/json',
+          },
+        ),
+
         data: {
-          'documentType': documentType,
-          'documentNumber': documentNumber,
-          'password': password,
+          'codDocumento': documentType,
+          'numDocumento': documentNumber,
+          'contrasenia': password,
+          'totp': '123456',
         },
       );
 
       if (response.statusCode == 200) {
-        return UserModel.fromJson(response.data['data']);
+        return UserModel.fromJson(response.data);
       } else {
         throw ServerException(
           message: response.data['message'] ?? 'Error al iniciar sesión',
@@ -51,10 +60,8 @@ class AuthRemoteDataSourceImpl implements AuthRemoteDataSource {
   @override
   Future<void> logout() async {
     try {
-      // Esta es la línea que David verá en verde en la terminal
       await apiClient.post('/auth/logout');
     } catch (e) {
-      // Si falla el servidor, lanzamos excepción para que el Repo la maneje
       throw ServerException(message: 'No se pudo cerrar sesión en el servidor');
     }
   }

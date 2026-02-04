@@ -44,11 +44,13 @@ class ApiClient {
   Future<Response> get(
     String path, {
     Map<String, dynamic>? queryParameters,
+    Options? options,
   }) async {
     try {
       return await _dio.get(
         path,
         queryParameters: queryParameters,
+        options: options,
       );
     } on DioException catch (e) {
       throw _handleError(e);
@@ -59,12 +61,14 @@ class ApiClient {
     String path, {
     dynamic data,
     Map<String, dynamic>? queryParameters,
+    Options? options,
   }) async {
     try {
       return await _dio.post(
         path,
         data: data,
         queryParameters: queryParameters,
+        options: options,
       );
     } on DioException catch (e) {
       throw _handleError(e);
@@ -77,11 +81,7 @@ class ApiClient {
     Map<String, dynamic>? queryParameters,
   }) async {
     try {
-      return await _dio.put(
-        path,
-        data: data,
-        queryParameters: queryParameters,
-      );
+      return await _dio.put(path, data: data, queryParameters: queryParameters);
     } on DioException catch (e) {
       throw _handleError(e);
     }
@@ -114,23 +114,17 @@ class ApiClient {
 
       case DioExceptionType.badResponse:
         final statusCode = error.response?.statusCode;
-        final message = error.response?.data?['message'] ??
+        final message =
+            error.response?.data?['message'] ??
             'Error del servidor. Intenta nuevamente.';
 
-        return ServerException(
-          message: message,
-          statusCode: statusCode,
-        );
+        return ServerException(message: message, statusCode: statusCode);
 
       case DioExceptionType.cancel:
-        return ServerException(
-          message: 'La solicitud fue cancelada.',
-        );
+        return ServerException(message: 'La solicitud fue cancelada.');
 
       case DioExceptionType.connectionError:
-        throw NetworkException(
-          message: 'Error de conexión. Verifica tu red.',
-        );
+        throw NetworkException(message: 'Error de conexión. Verifica tu red.');
 
       default:
         return ServerException(
