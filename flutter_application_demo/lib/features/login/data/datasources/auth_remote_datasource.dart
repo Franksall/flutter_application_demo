@@ -50,6 +50,9 @@ class AuthRemoteDataSourceImpl implements AuthRemoteDataSource {
         );
       }
     } catch (e) {
+      // 👇👇👇 ¡AQUÍ ES DONDE LO PONES! 👇👇👇
+      print("🚨 ERROR CRÍTICO EN LOGIN: $e");
+
       if (e is ServerException || e is NetworkException) {
         rethrow;
       }

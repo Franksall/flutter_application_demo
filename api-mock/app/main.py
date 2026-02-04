@@ -1,7 +1,9 @@
-from fastapi import FastAPI, Header, Request
+from fastapi import FastAPI, Header, Request,HTTPException
 from fastapi.middleware.cors import CORSMiddleware
 from fastapi.responses import JSONResponse
 from contextlib import asynccontextmanager
+from pydantic import BaseModel
+from typing import Optional
 import uvicorn
 
 from app.routes import operations_router, approvals_router,auth
@@ -37,6 +39,11 @@ LICENSE_INFO = {
     "url": "https://financieraoh.com/licenses"
 }
 
+class LoginRequest(BaseModel):
+    codDocumento: str
+    numDocumento: str
+    contrasenia: str
+    totp: str
 
 @asynccontextmanager
 async def lifespan(app: FastAPI):
@@ -98,19 +105,35 @@ app.include_router(approvals_router, prefix="/v1")
 
 app.include_router(auth.router, prefix="/v1")
 
+@app.post("/v1/auth/ctaemp/login", tags=["Auth Cta Emp"])
+async def login_cta_emp(request: LoginRequest, x_api_key: Optional[str] = Header(None, alias="x-api-key")):
+    print(f"📡 LOGIN CTA EMP - Recibido")
+    print(f"🔑 Headers: x-api-key={x_api_key}")
+    print(f"📦 Body: {request}")
 
+    
+    if request.contrasenia == "123456":
+        print("✅ Login Exitoso (Simulado)")
+        return {
+            "message": "Login exitoso",
+            "data": {
+                "id": "user_001",
+                "name": "admin foh",
+                "email": "adminfoh@financieraoh.pe",
+                "documentNumber": request.numDocumento,
+                "documentType": "DNI",
+                "role": "ADMIN",
+                "token": "mock-jwt-token-123456",
+                "refreshToken": "mock-refresh-token"
+            }
+        }
+    else:
+        print("❌ Login Fallido")
+        raise HTTPException(status_code=401, detail="Credenciales inválidas")
 # Endpoint raíz
 @app.get("/", tags=["Root"])
 async def root():
-    """Endpoint raíz con información del API"""
-    return {
-        "message": "Approval Management API Mock - Financiera OH",
-        "version": VERSION,
-        "docs": "/docs",
-        "redoc": "/redoc",
-        "openapi": "/openapi.json",
-        "status": "running"
-    }
+    return {"status": "running", "version": VERSION}
 
 # Endpoint para obtener el token de sesión 
 @app.get("/v1/api/session-token/{dni}", tags=["FaceTec Bypass"])
