@@ -27,7 +27,7 @@ class _RecoveryBiometricValidationPageState
 
   Future<void> _ejecutarBypassPost() async {
     try {
-      //  GENERARÁ EL LOG
+      //   LOG
       await getIt<ApiClient>().post(
         '/api/identity/facial-enrollment-3d',
         data: {
@@ -43,7 +43,7 @@ class _RecoveryBiometricValidationPageState
         context.go(AppConstants.recoveryPasswordRoute);
       }
     } catch (e) {
-      // Si falla, igual dejamos pasar para no trabar la demo
+      //  falla pass, demo
       debugPrint("Error bypass POST: $e");
       if (mounted) {
         context.go(AppConstants.recoveryPasswordRoute);
