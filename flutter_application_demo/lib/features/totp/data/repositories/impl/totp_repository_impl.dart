@@ -1,4 +1,3 @@
-// USAR ESTE EN LUGAR DEL DE LA IMAGEN
 import 'package:flutter_application_demo/core/network/api_client.dart';
 import 'package:flutter_application_demo/core/resources/data_state.dart';
 import '../../domain/repositories/i_otp_repository.dart';

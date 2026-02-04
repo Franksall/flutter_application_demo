@@ -1,13 +1,12 @@
 import 'dart:async';
-import 'package:intl/intl.dart'; // Necesitas instalar 'intl'
-import 'package:otp/otp.dart'; // Necesitas instalar 'otp'
-// Importa tus entidades y casos de uso
+import 'package:intl/intl.dart';
+import 'package:otp/otp.dart';
+
 import '../../domain/entities/totp_entity.dart';
 import '../../domain/usecases/get_secret_use_case.dart';
 import '../../domain/usecases/validate_otp_use_case.dart';
 import 'package:flutter_application_demo/core/resources/data_state.dart';
 
-// Asumo que IBloc es una interfaz simple en tu proyecto
 abstract class IBloc {
   void initialize();
   void dispose();
@@ -63,9 +62,7 @@ class TotpBloc extends IBloc {
      * utiliza una ventana de 30 sec (this.timeStepSeconds = 30);
      */
     var counter = ((time.toUtc().millisecondsSinceEpoch ~/ 1000) ~/ 30);
-    _otp = totp.generateOTP(
-      input: counter,
-    ); // Corregido: totp.generateOTP usa el algoritmo interno
+    _otp = totp.generateOTP(input: counter);
 
     final model = TotpEntity(
       dateTime: time,
