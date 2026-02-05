@@ -10,10 +10,10 @@ class ValidateOtpUseCase implements UseCase<DataState<bool>, String> {
   final FlutterSecureStorage _storage;
 
   @override
-  Future<DataState<bool>> call({required String params}) async {
+  Future<DataState<bool>> call({String? params}) async {
     final String? secret = await _storage.read(key: 'otp_secret');
     final result = await _repository.validateOtp(
-      otp: params,
+      otp: params ?? '',
       secret: secret ?? '',
     );
     return result;

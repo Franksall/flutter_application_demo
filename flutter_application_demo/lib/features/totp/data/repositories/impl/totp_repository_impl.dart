@@ -1,28 +1,36 @@
-import 'dart:convert';
-import 'dart:io';
-import 'package:http/http.dart' as http;
+import 'package:flutter_application_demo/core/network/api_client.dart';
+import 'package:flutter_application_demo/core/resources/data_state.dart';
+import 'package:flutter_application_demo/features/totp/domain/repositories/i_otp_repository.dart';
 
 class TotpRepositoryImpl implements IOtpRepository {
-  TotpRepositoryImpl({required this.baseUrl});
+  // Usamos ApiClient (Servicio Centralizado)
+  // En lugar de 'baseUrl' pegada aquí, usamos la configuración global de la App.
+  // Esto maneja automáticamente los Headers (x-api-key) y el ambiente.
+  final ApiClient _apiClient;
 
-  /** Para casos practicos y al haber probado localmente, la base
-   * url utilizada fue http://localhost:8080/totp
-   * En emulador android -> http://10.0.2.2:8080/totp
-   */
-  final String baseUrl;
+  TotpRepositoryImpl(this._apiClient);
 
   @override
   Future<DataState<String>> enroll() async {
     try {
-      final response = await http.post(Uri.parse('$baseUrl/enroll'));
+      //  Endpoint limpio
+      // Si en el futuro hay que enviar datos, solo agregamos "data: {...}"
+      final response = await _apiClient.post('/totp/enroll');
 
-      if (response.statusCode == HttpStatus.ok) {
-        final Map<String, dynamic> body = jsonDecode(response.body);
-        return DataSuccess(body["base32Secret"]);
+      if (response.statusCode == 200) {
+        //  Validación y Extracción segura
+        // Dio ya hace el jsonDecode automáticamente
+        final secret = response.data["base32Secret"];
+
+        if (secret != null) {
+          return DataSuccess(secret.toString());
+        } else {
+          return DataFailed("El servidor no devolvió el 'base32Secret'");
+        }
       }
-      return DataFailed('Error: ${response.statusCode}');
+      return DataFailed('Error del servidor: ${response.statusCode}');
     } catch (e) {
-      return DataFailed('$e');
+      return DataFailed(e.toString());
     }
   }
 
@@ -32,18 +40,19 @@ class TotpRepositoryImpl implements IOtpRepository {
     required String secret,
   }) async {
     try {
-      final response = await http.post(
-        Uri.parse('$baseUrl/validate'),
-        headers: <String, String>{'Content-Type': 'application/json'},
-        body: jsonEncode(<String, String>{'base32Secret': secret, 'otp': otp}),
+      //  Reutilización del servicio para validar
+      final response = await _apiClient.post(
+        '/totp/validate',
+        data: {'base32Secret': secret, 'otp': otp},
       );
 
-      if (response.statusCode == HttpStatus.ok) {
-        return DataSuccess(response.body.toLowerCase() == 'true');
+      if (response.statusCode == 200) {
+        // El backend puede devolver un booleano (true) o un string ("true")
+        return DataSuccess(response.data.toString().toLowerCase() == 'true');
       }
-      return DataFailed('Error: ${response.statusCode}');
+      return DataFailed('Error del servidor: ${response.statusCode}');
     } catch (e) {
-      return DataFailed('$e');
+      return DataFailed(e.toString());
     }
   }
 }

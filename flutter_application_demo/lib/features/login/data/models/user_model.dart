@@ -12,11 +12,22 @@ class UserModel extends UserEntity {
 
   factory UserModel.fromJson(Map<String, dynamic> json) {
     return UserModel(
-      id: json['id'] as String,
-      documentNumber: json['documentNumber'] as String,
-      documentType: json['documentType'] as String,
-      name: json['name'] as String,
-      token: json['token'] as String,
+      //ID: Si viene nulo, ponemos '1'
+      id: json['id']?.toString() ?? '1',
+      //NUMERO: Buscamos 'documentNumber' O 'numDocumento'
+      documentNumber:
+          json['documentNumber']?.toString() ??
+          json['numDocumento']?.toString() ??
+          '',
+      //TIPO: Buscamos 'documentType' O 'codDocumento'
+      documentType:
+          json['documentType']?.toString() ??
+          json['codDocumento']?.toString() ??
+          '',
+      //NOMBRE: Si viene nulo, ponemos 'Usuario'
+      name: json['name']?.toString() ?? 'Usuario OH',
+      //  TOKEN: si falta, ponemos uno falso para que no explote.
+      token: json['token']?.toString() ?? 'token-simulado-123',
       requiresFacialVerification:
           json['requiresFacialVerification'] as bool? ?? false,
     );
