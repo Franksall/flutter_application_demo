@@ -130,6 +130,36 @@ async def login_cta_emp(request: LoginRequest, x_api_key: Optional[str] = Header
     else:
         print("❌ Login Fallido")
         raise HTTPException(status_code=401, detail="Credenciales inválidas")
+    
+
+@app.post("/v1/totp/enroll", tags=["TOTP"])
+async def enroll_totp():
+    """
+    Simula el enrolamiento del token.
+    Devuelve una 'semilla' (Secret) fija para que la App genere los números.
+    """
+    print("🔐 Solicitud de enrolamiento TOTP recibida")
+    return {
+        "base32Secret": "JBSWY3DPEHPK3PXP", #  es la clave secreta simulada
+        "algorithm": "SHA1",
+        "digits": 6,
+        "period": 30
+    }
+
+@app.post("/v1/totp/validate", tags=["TOTP"])
+async def validate_totp(request: Request):
+    """
+    Simula la validación.
+    En este Mock, SIEMPRE dice que el código es correcto (True).
+    """
+    body = await request.json()
+    print(f"🔢 Validando TOTP: {body}")
+    
+    
+    return True
+
+
+
 # Endpoint raíz
 @app.get("/", tags=["Root"])
 async def root():
